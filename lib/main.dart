@@ -2,10 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-// import 'package:google_maps_webservice/places.dart';
-
-// final _placesApiClient =
-//     GoogleMapsPlaces(apiKey: 'AIzaSyDDe6H3vq8lNxM0NhCBMsKOtBH3EdgGsgE');
 
 void main() => runApp(const MyApp());
 
@@ -43,26 +39,6 @@ class MapSampleState extends State<MapSample> {
       target: LatLng(35.6580339, 139.7016358),
       // tilt: 59.440717697143555,
       zoom: 14.4746);
-
-  // static const LatLng _marker1 = LatLng(35.6510339, 139.7046358);
-  // static const LatLng _marker2 = LatLng(35.6612339, 139.7003358);
-
-  // Set<Marker> _createMarker() {
-  //   return {
-  //     const Marker(
-  //       markerId: MarkerId("marker_1"),
-  //       position: _marker1,
-  //       infoWindow: InfoWindow(title: "施設1", snippet: 'よい施設'),
-  //     ),
-  //     const Marker(
-  //       markerId: MarkerId("marker_2"),
-  //       position: _marker2,
-  //       infoWindow: InfoWindow(title: "施設2", snippet: 'そこそこの施設'),
-  //     ),
-  //   };
-  // }
-
-// List<Map<String, LatLng>> myMapList = [{'markerId': 'marker_1', 'position': LatLng(35.6510339, 139.7046358)}];
 
   List documents = [
     {
@@ -111,54 +87,6 @@ class MapSampleState extends State<MapSample> {
             mapController: _mapController,
             documents: documents,
           ),
-
-          // GoogleMap(
-          //   mapType: MapType.normal,
-          //   initialCameraPosition: _kGooglePlex,
-          //   buildingsEnabled: false,
-          //   markers: documents
-          //       .map((document) => Marker(
-          //             markerId: MarkerId(document['markerId'] as String),
-          //             position: document['position'],
-          //             infoWindow: InfoWindow(
-          //               title: document['name'] as String?,
-          //               snippet: document['address'] as String?,
-          //             ),
-          //           ))
-          //       .toSet(),
-          //   onTap: _handleTap,
-          //   onMapCreated: (GoogleMapController controller) {
-          //     _mapController.complete(controller);
-          //   },
-          // ),
-          // Align(
-          //   alignment: Alignment.topLeft,
-          //   child: Padding(
-          //     padding: const EdgeInsets.only(top: 10),
-          //     child: SizedBox(
-          //         height: 90,
-          //         child: ListView.builder(
-          //           scrollDirection: Axis.horizontal,
-          //           itemCount: documents.length,
-          //           itemBuilder: (context, index) {
-          //             return SizedBox(
-          //               width: 340,
-          //               child: Padding(
-          //                 padding: const EdgeInsets.only(left: 8),
-          //                 child: Card(
-          //                   child: Center(
-          //                     child: StoreListTile(
-          //                       document: documents[index],
-          //                       mapController: _mapController,
-          //                     ),
-          //                   ),
-          //                 ),
-          //               ),
-          //             );
-          //           },
-          //         )),
-          //   ),
-          // )
         ]);
       }),
       floatingActionButton: FloatingActionButton.extended(
@@ -261,32 +189,16 @@ class StoreListTile extends StatefulWidget {
 
 class _StoreListTileState extends State<StoreListTile> {
   String _placePhotoUrl = '';
-  // bool _disposed = false;
 
   @override
   void initState() {
     super.initState();
-    // _retrievePlacesDetails();
   }
 
   @override
   void dispose() {
-    // _disposed = true;
     super.dispose();
   }
-
-  // Future<void> _retrievePlacesDetails() async {
-  //   final details = await _placesApiClient
-  //       .getDetailsByPlaceId(widget.document['placeId'] as String);
-  //   if (!_disposed) {
-  //     setState(() {
-  //       _placePhotoUrl = _placesApiClient.buildPhotoUrl(
-  //         photoReference: details.result.photos[0].photoReference,
-  //         maxHeight: 300,
-  //       );
-  //     });
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
