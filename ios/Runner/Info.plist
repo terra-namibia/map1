@@ -43,5 +43,8 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<!-- Google Maps API Key -->
+	<key>API_KEY_MAP</key>
+	<string></string>
 </dict>
 </plist>
