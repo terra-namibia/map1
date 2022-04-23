@@ -33,6 +33,8 @@ class MapSampleState extends State<MapSample> {
   );
 
   static const initialPosition = LatLng(35.6580339, 139.7016358);
+  static const northEastPosition = LatLng(35.6684577, 139.7102433);
+  static const southWestPosition = LatLng(35.6483480, 139.6928290);
 
   static const CameraPosition _kLake = CameraPosition(
       bearing: 0.0,
@@ -81,6 +83,8 @@ class MapSampleState extends State<MapSample> {
           StoreMap(
             documents: documents,
             initialPosition: initialPosition,
+            northEastPosition: northEastPosition,
+            southWestPosition: southWestPosition,
             mapController: _mapController,
           ),
           StoreCarousel(
@@ -235,11 +239,15 @@ class StoreMap extends StatelessWidget {
     Key? key,
     required this.documents,
     required this.initialPosition,
+    required this.northEastPosition,
+    required this.southWestPosition,
     required this.mapController,
   }) : super(key: key);
 
   final List documents;
   final LatLng initialPosition;
+  final LatLng northEastPosition;
+  final LatLng southWestPosition;
   final Completer<GoogleMapController> mapController;
 
   @override
@@ -250,8 +258,8 @@ class StoreMap extends StatelessWidget {
         zoom: 12,
       ),
       cameraTargetBounds: CameraTargetBounds(LatLngBounds(
-        southwest: const LatLng(35.6483480, 139.6928290),
-        northeast: const LatLng(35.6684577, 139.7102433),
+        northeast: northEastPosition,
+        southwest: southWestPosition,
       )),
       markers: documents
           .map((document) => Marker(
