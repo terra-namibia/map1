@@ -27,32 +27,27 @@ class MapSample extends StatefulWidget {
 class MapSampleState extends State<MapSample> {
   final Completer<GoogleMapController> _mapController = Completer();
 
-  static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(35.6580339, 139.7016358),
-    zoom: 14.4746,
-  );
-
   static const initialPosition = LatLng(35.6580339, 139.7016358);
   static const northEastPosition = LatLng(35.6684577, 139.7102433);
   static const southWestPosition = LatLng(35.6483480, 139.6928290);
 
-  static const CameraPosition _kLake = CameraPosition(
+  static const CameraPosition _home = CameraPosition(
       bearing: 0.0,
       target: LatLng(35.6580339, 139.7016358),
       // tilt: 59.440717697143555,
-      zoom: 14.4746);
+      zoom: 14);
 
   List documents = [
     {
       'markerId': 'marker_1',
-      'position': const LatLng(35.6510339, 139.7046358),
-      'infoWindow': const InfoWindow(title: "施設2", snippet: 'そこそこの施設'),
+      'position': const LatLng(35.6612339, 139.7003358),
+      'infoWindow': const InfoWindow(title: "施設1", snippet: 'いい施設'),
       'name': '施設1',
       'address': '渋谷区1丁目',
     },
     {
       'markerId': 'marker_2',
-      'position': const LatLng(35.6612339, 139.7003358),
+      'position': const LatLng(35.6510339, 139.7046358),
       'infoWindow': const InfoWindow(title: "施設2", snippet: 'そこそこの施設'),
       'name': '施設2',
       'address': '渋谷区2丁目',
@@ -103,7 +98,7 @@ class MapSampleState extends State<MapSample> {
 
   Future<void> _goToHome() async {
     final GoogleMapController controller = await _mapController.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
+    controller.animateCamera(CameraUpdate.newCameraPosition(_home));
   }
 
   _handleTap(LatLng tappedPoint) {
@@ -141,7 +136,7 @@ class StoreCarousel extends StatelessWidget {
 }
 
 class StoreCarouselList extends StatelessWidget {
-  const StoreCarouselList({
+  StoreCarouselList({
     Key? key,
     required this.documents,
     required this.mapController,
@@ -193,6 +188,8 @@ class StoreListTile extends StatefulWidget {
 
 class _StoreListTileState extends State<StoreListTile> {
   String _placePhotoUrl = '';
+  var _scrollController = ScrollController();
+  final itemKey = GlobalKey();
 
   @override
   void initState() {
@@ -209,6 +206,7 @@ class _StoreListTileState extends State<StoreListTile> {
     return ListTile(
       title: Text(widget.document['name'] as String),
       subtitle: Text(widget.document['address'] as String),
+      key: itemKey,
       leading: SizedBox(
         width: 100,
         height: 100,
@@ -220,12 +218,20 @@ class _StoreListTileState extends State<StoreListTile> {
             : Container(),
       ),
       onTap: () async {
+        // await _scrollController.animateTo(
+        //   0,
+        //   duration: const Duration(seconds: 1),
+        //   curve: Curves.linear,
+        // );
+        final context = itemKey.currentContext!;
+        await Scrollable.ensureVisible(context);
+
         final controller = await widget.mapController.future;
         await controller.animateCamera(
           CameraUpdate.newCameraPosition(
             CameraPosition(
               target: widget.document['position'],
-              zoom: 16,
+              zoom: 14,
             ),
           ),
         );
@@ -255,7 +261,7 @@ class StoreMap extends StatelessWidget {
     return GoogleMap(
       initialCameraPosition: CameraPosition(
         target: initialPosition,
-        zoom: 12,
+        zoom: 14,
       ),
       cameraTargetBounds: CameraTargetBounds(LatLngBounds(
         northeast: northEastPosition,
@@ -268,13 +274,20 @@ class StoreMap extends StatelessWidget {
                     BitmapDescriptor.hueCyan),
                 position: document['position'],
                 infoWindow: InfoWindow(
-                  title: document['name'] as String?,
-                  snippet: document['address'] as String?,
-                ),
+                    title: document['name'] as String?,
+                    snippet: document['address'] as String?,
+                    onTap: () {
+                      print('marker tapped');
+                    }),
               ))
           .toSet(),
       onMapCreated: (mapController) {
         this.mapController.complete(mapController);
+      },
+      onTap: (LatLng latLng) {
+        // final context = itemKey.currentContext!;
+        // Scrollable.ensureVisible(context);
+        print('map tapped');
       },
     );
   }
