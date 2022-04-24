@@ -269,17 +269,17 @@ class StoreMap extends StatelessWidget {
       )),
       markers: documents
           .map((document) => Marker(
-                markerId: MarkerId(document['markerId'] as String),
-                icon: BitmapDescriptor.defaultMarkerWithHue(
-                    BitmapDescriptor.hueCyan),
-                position: document['position'],
-                infoWindow: InfoWindow(
-                    title: document['name'] as String?,
-                    snippet: document['address'] as String?,
-                    onTap: () {
-                      print('marker tapped');
-                    }),
-              ))
+              markerId: MarkerId(document['markerId'] as String),
+              icon: BitmapDescriptor.defaultMarkerWithHue(
+                  BitmapDescriptor.hueCyan),
+              position: document['position'],
+              infoWindow: InfoWindow(
+                title: document['name'] as String?,
+                snippet: document['address'] as String?,
+              ),
+              onTap: () {
+                print('marker tapped');
+              }))
           .toSet(),
       onMapCreated: (mapController) {
         this.mapController.complete(mapController);
