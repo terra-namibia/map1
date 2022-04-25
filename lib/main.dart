@@ -58,6 +58,12 @@ class MapSampleState extends State<MapSample> {
     print("tapped setting!");
   }
 
+  void onTapMarker() {
+    setState(() {
+      print("onTapMarker");
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,6 +87,7 @@ class MapSampleState extends State<MapSample> {
             northEastPosition: northEastPosition,
             southWestPosition: southWestPosition,
             mapController: _mapController,
+            onTapMarker: onTapMarker,
           ),
           StoreCarousel(
             mapController: _mapController,
@@ -248,6 +255,7 @@ class StoreMap extends StatelessWidget {
     required this.northEastPosition,
     required this.southWestPosition,
     required this.mapController,
+    required this.onTapMarker,
   }) : super(key: key);
 
   final List documents;
@@ -255,6 +263,7 @@ class StoreMap extends StatelessWidget {
   final LatLng northEastPosition;
   final LatLng southWestPosition;
   final Completer<GoogleMapController> mapController;
+  final onTapMarker;
 
   @override
   Widget build(BuildContext context) {
@@ -269,17 +278,16 @@ class StoreMap extends StatelessWidget {
       )),
       markers: documents
           .map((document) => Marker(
-              markerId: MarkerId(document['markerId'] as String),
-              icon: BitmapDescriptor.defaultMarkerWithHue(
-                  BitmapDescriptor.hueCyan),
-              position: document['position'],
-              infoWindow: InfoWindow(
-                title: document['name'] as String?,
-                snippet: document['address'] as String?,
-              ),
-              onTap: () {
-                print('marker tapped');
-              }))
+                markerId: MarkerId(document['markerId'] as String),
+                icon: BitmapDescriptor.defaultMarkerWithHue(
+                    BitmapDescriptor.hueCyan),
+                position: document['position'],
+                infoWindow: InfoWindow(
+                  title: document['name'] as String?,
+                  snippet: document['address'] as String?,
+                ),
+                onTap: () => {print("marker tapped"), onTapMarker()},
+              ))
           .toSet(),
       onMapCreated: (mapController) {
         this.mapController.complete(mapController);
