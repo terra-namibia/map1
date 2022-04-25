@@ -39,6 +39,7 @@ class MapSampleState extends State<MapSample> {
 
   List documents = [
     {
+      'itemKey': GlobalKey(),
       'markerId': 'marker_1',
       'position': const LatLng(35.6612339, 139.7003358),
       'infoWindow': const InfoWindow(title: "施設1", snippet: 'いい施設'),
@@ -46,6 +47,7 @@ class MapSampleState extends State<MapSample> {
       'address': '渋谷区1丁目',
     },
     {
+      'itemKey': GlobalKey(),
       'markerId': 'marker_2',
       'position': const LatLng(35.6510339, 139.7046358),
       'infoWindow': const InfoWindow(title: "施設2", snippet: 'そこそこの施設'),
@@ -58,10 +60,9 @@ class MapSampleState extends State<MapSample> {
     print("tapped setting!");
   }
 
-  void onTapMarker() {
-    setState(() {
-      print("onTapMarker");
-    });
+  void markerTapped(document) {
+    final context = document['itemKey'].currentContext!;
+    Scrollable.ensureVisible(context);
   }
 
   @override
@@ -87,8 +88,49 @@ class MapSampleState extends State<MapSample> {
             northEastPosition: northEastPosition,
             southWestPosition: southWestPosition,
             mapController: _mapController,
-            onTapMarker: onTapMarker,
+            markerTapped: markerTapped,
           ),
+          // SizedBox(
+          //   height: 90,
+          //   child: ListView.builder(
+          //     scrollDirection: Axis.horizontal,
+          //     itemCount: documents.length,
+          //     itemBuilder: (context, index) {
+          //       return SizedBox(
+          //         width: 340,
+          //         child: Padding(
+          //           padding: const EdgeInsets.only(left: 8),
+          //           child: Card(
+          //             child: Container(
+          //               height: 90,
+          //               child: Center(
+          //                   child: ListTile(
+          //                 key: documents[index]['itemKey'],
+          //                 title: Text('${documents[index]['name']}'),
+          //                 subtitle: Text('${documents[index]['itemKey']}'),
+          //                 onTap: () async {
+          //                   final context =
+          //                       documents[index]['itemKey'].currentContext!;
+          //                   await Scrollable.ensureVisible(context);
+          //                   final controller = await _mapController.future;
+          //                   await controller.animateCamera(
+          //                     CameraUpdate.newCameraPosition(
+          //                       CameraPosition(
+          //                         target: documents[index]['position'],
+          //                         zoom: 14,
+          //                       ),
+          //                     ),
+          //                   );
+          //                 },
+          //               )),
+          //             ),
+          //           ),
+          //         ),
+          //       );
+          //     },
+          //   ),
+          // ),
+
           StoreCarousel(
             mapController: _mapController,
             documents: documents,
@@ -196,7 +238,6 @@ class StoreListTile extends StatefulWidget {
 class _StoreListTileState extends State<StoreListTile> {
   String _placePhotoUrl = '';
   var _scrollController = ScrollController();
-  final itemKey = GlobalKey();
 
   @override
   void initState() {
@@ -213,7 +254,7 @@ class _StoreListTileState extends State<StoreListTile> {
     return ListTile(
       title: Text(widget.document['name'] as String),
       subtitle: Text(widget.document['address'] as String),
-      key: itemKey,
+      key: widget.document['itemKey'],
       leading: SizedBox(
         width: 100,
         height: 100,
@@ -230,7 +271,8 @@ class _StoreListTileState extends State<StoreListTile> {
         //   duration: const Duration(seconds: 1),
         //   curve: Curves.linear,
         // );
-        final context = itemKey.currentContext!;
+        print(widget.document['itemKey']);
+        final context = widget.document['itemKey'].currentContext!;
         await Scrollable.ensureVisible(context);
 
         final controller = await widget.mapController.future;
@@ -255,7 +297,7 @@ class StoreMap extends StatelessWidget {
     required this.northEastPosition,
     required this.southWestPosition,
     required this.mapController,
-    required this.onTapMarker,
+    required this.markerTapped,
   }) : super(key: key);
 
   final List documents;
@@ -263,7 +305,7 @@ class StoreMap extends StatelessWidget {
   final LatLng northEastPosition;
   final LatLng southWestPosition;
   final Completer<GoogleMapController> mapController;
-  final onTapMarker;
+  final markerTapped;
 
   @override
   Widget build(BuildContext context) {
@@ -286,15 +328,13 @@ class StoreMap extends StatelessWidget {
                   title: document['name'] as String?,
                   snippet: document['address'] as String?,
                 ),
-                onTap: () => {print("marker tapped"), onTapMarker()},
+                onTap: () => {print("marker tapped"), markerTapped(document)},
               ))
           .toSet(),
       onMapCreated: (mapController) {
         this.mapController.complete(mapController);
       },
       onTap: (LatLng latLng) {
-        // final context = itemKey.currentContext!;
-        // Scrollable.ensureVisible(context);
         print('map tapped');
       },
     );
