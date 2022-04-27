@@ -40,7 +40,7 @@ class MapSampleState extends State<MapSample> {
   List documents = [
     {
       'itemKey': GlobalKey(),
-      'markerId': 'marker_1',
+      'markerId': '1',
       'position': const LatLng(35.6612339, 139.7003358),
       'infoWindow': const InfoWindow(title: "施設1", snippet: 'いい施設'),
       'name': '施設1',
@@ -48,12 +48,28 @@ class MapSampleState extends State<MapSample> {
     },
     {
       'itemKey': GlobalKey(),
-      'markerId': 'marker_2',
-      'position': const LatLng(35.6510339, 139.7046358),
+      'markerId': '2',
+      'position': const LatLng(35.6510339, 139.6996358),
       'infoWindow': const InfoWindow(title: "施設2", snippet: 'そこそこの施設'),
       'name': '施設2',
       'address': '渋谷区2丁目',
-    }
+    },
+    {
+      'itemKey': GlobalKey(),
+      'markerId': '3',
+      'position': const LatLng(35.6510339, 139.7043358),
+      'infoWindow': const InfoWindow(title: "施設3", snippet: 'そこそこの施設'),
+      'name': '施設3',
+      'address': '渋谷区3丁目',
+    },
+    {
+      'itemKey': GlobalKey(),
+      'markerId': '4',
+      'position': const LatLng(35.6410339, 139.7046358),
+      'infoWindow': const InfoWindow(title: "施設4", snippet: 'そこそこの施設'),
+      'name': '施設4',
+      'address': '渋谷区4丁目',
+    },
   ];
 
   _goToSetting() {
@@ -61,6 +77,8 @@ class MapSampleState extends State<MapSample> {
   }
 
   void markerTapped(document) {
+    print(document['itemKey']);
+    print(document['itemKey'].currentContext);
     final context = document['itemKey'].currentContext!;
     Scrollable.ensureVisible(context);
   }
@@ -90,10 +108,51 @@ class MapSampleState extends State<MapSample> {
             mapController: _mapController,
             markerTapped: markerTapped,
           ),
-          StoreCarousel(
-            mapController: _mapController,
-            documents: documents,
+          SizedBox(
+            height: 90,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: documents.length,
+              itemBuilder: (context, index) {
+                return SizedBox(
+                  width: 340,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8),
+                    child: Card(
+                      child: Container(
+                        height: 90,
+                        child: Center(
+                            child: ListTile(
+                          key: documents[index]['itemKey'],
+                          title: Text('${documents[index]['name']}'),
+                          subtitle: Text('${documents[index]['itemKey']}'),
+                          onTap: () async {
+                            final context =
+                                documents[index]['itemKey'].currentContext!;
+                            await Scrollable.ensureVisible(context);
+                            final controller = await _mapController.future;
+                            await controller.animateCamera(
+                              CameraUpdate.newCameraPosition(
+                                CameraPosition(
+                                  target: documents[index]['position'],
+                                  zoom: 14,
+                                ),
+                              ),
+                            );
+                          },
+                        )),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
+
+          // StoreCarousel(
+          //   mapController: _mapController,
+          //   documents: documents,
+          // ),
         ]);
       }),
       floatingActionButton: FloatingActionButton.extended(
