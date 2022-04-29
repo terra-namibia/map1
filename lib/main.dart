@@ -26,12 +26,19 @@ class MapSample extends StatefulWidget {
 
 class MapSampleState extends State<MapSample> {
   final Completer<GoogleMapController> _mapController = Completer();
+  final _pageController = PageController();
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   static const initialPosition = LatLng(35.6580339, 139.7016358);
   static const northEastPosition = LatLng(35.6684577, 139.7102433);
-  static const southWestPosition = LatLng(35.6483480, 139.6928290);
+  static const southWestPosition = LatLng(35.6200000, 139.6200000);
 
-  static const CameraPosition _home = CameraPosition(
+  static const CameraPosition _homePosition = CameraPosition(
       bearing: 0.0,
       target: LatLng(35.6580339, 139.7016358),
       // tilt: 59.440717697143555,
@@ -70,17 +77,30 @@ class MapSampleState extends State<MapSample> {
       'name': '施設4',
       'address': '渋谷区4丁目',
     },
+    {
+      'itemKey': GlobalKey(),
+      'markerId': '5',
+      'position': const LatLng(35.6310339, 139.6746358),
+      'infoWindow': const InfoWindow(title: "施設5", snippet: 'そこそこの施設'),
+      'name': '施設5',
+      'address': '渋谷区5丁目',
+    },
   ];
 
   _goToSetting() {
     print("tapped setting!");
   }
 
-  void markerTapped(document) {
-    print(document['itemKey']);
-    print(document['itemKey'].currentContext);
-    final context = document['itemKey'].currentContext!;
-    Scrollable.ensureVisible(context);
+  void markerTapped(index) {
+    // print(document['itemKey']);
+    // print(document['itemKey'].currentContext);
+    // final context = document['itemKey'].currentContext!;
+    // Scrollable.ensureVisible(context);
+    if (_pageController.hasClients) {
+      _pageController.animateToPage(index,
+          duration: const Duration(milliseconds: 100),
+          curve: Curves.bounceInOut);
+    }
   }
 
   @override
@@ -110,8 +130,10 @@ class MapSampleState extends State<MapSample> {
           ),
           SizedBox(
             height: 90,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
+            child: PageView.builder(
+              // scrollDirection: Axis.horizontal,
+              controller: _pageController,
+              // physics: const NeverScrollableScrollPhysics(),
               itemCount: documents.length,
               itemBuilder: (context, index) {
                 return SizedBox(
@@ -122,32 +144,77 @@ class MapSampleState extends State<MapSample> {
                       child: Container(
                         height: 90,
                         child: Center(
-                            child: ListTile(
-                          key: documents[index]['itemKey'],
-                          title: Text('${documents[index]['name']}'),
-                          subtitle: Text('${documents[index]['itemKey']}'),
-                          onTap: () async {
-                            final context =
-                                documents[index]['itemKey'].currentContext!;
-                            await Scrollable.ensureVisible(context);
-                            final controller = await _mapController.future;
-                            await controller.animateCamera(
-                              CameraUpdate.newCameraPosition(
-                                CameraPosition(
-                                  target: documents[index]['position'],
-                                  zoom: 14,
-                                ),
-                              ),
-                            );
-                          },
-                        )),
+                          child: Column(
+                              // key: documents[index]['itemKey'],
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text('${documents[index]['name']}'),
+                                Text('${documents[index]['address']}'),
+                                Text('${documents[index]['itemKey']}'),
+                              ]),
+                        ),
                       ),
+                    ),
+                  ),
+                );
+              },
+              onPageChanged: (index) async {
+                print('onPageChanged card');
+                print(documents[index]['name']);
+                print(documents[index]['itemKey']);
+
+                final controller = await _mapController.future;
+                await controller.animateCamera(
+                  CameraUpdate.newCameraPosition(
+                    CameraPosition(
+                      target: documents[index]['position'],
+                      zoom: 14,
                     ),
                   ),
                 );
               },
             ),
           ),
+          // SizedBox(
+          //   height: 90,
+          //   child: ListView.builder(
+          //     scrollDirection: Axis.horizontal,
+          //     itemCount: documents.length,
+          //     itemBuilder: (context, index) {
+          //       return SizedBox(
+          //         width: 340,
+          //         child: Padding(
+          //           padding: const EdgeInsets.only(left: 8),
+          //           child: Card(
+          //             child: Container(
+          //               height: 90,
+          //               child: Center(
+          //                   child: ListTile(
+          //                 key: documents[index]['itemKey'],
+          //                 title: Text('${documents[index]['name']}'),
+          //                 subtitle: Text('${documents[index]['itemKey']}'),
+          //                 onTap: () async {
+          //                   final context =
+          //                       documents[index]['itemKey'].currentContext!;
+          //                   await Scrollable.ensureVisible(context);
+          //                   final controller = await _mapController.future;
+          //                   await controller.animateCamera(
+          //                     CameraUpdate.newCameraPosition(
+          //                       CameraPosition(
+          //                         target: documents[index]['position'],
+          //                         zoom: 14,
+          //                       ),
+          //                     ),
+          //                   );
+          //                 },
+          //               )),
+          //             ),
+          //           ),
+          //         ),
+          //       );
+          //     },
+          //   ),
+          // ),
 
           // StoreCarousel(
           //   mapController: _mapController,
@@ -165,7 +232,7 @@ class MapSampleState extends State<MapSample> {
 
   Future<void> _goToHome() async {
     final GoogleMapController controller = await _mapController.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(_home));
+    controller.animateCamera(CameraUpdate.newCameraPosition(_homePosition));
   }
 
   _handleTap(LatLng tappedPoint) {
@@ -337,16 +404,19 @@ class StoreMap extends StatelessWidget {
         southwest: southWestPosition,
       )),
       markers: documents
-          .map((document) => Marker(
-                markerId: MarkerId(document['markerId'] as String),
+          .asMap()
+          .keys
+          .toList()
+          .map((index) => Marker(
+                markerId: MarkerId(documents[index]['markerId'] as String),
                 icon: BitmapDescriptor.defaultMarkerWithHue(
                     BitmapDescriptor.hueCyan),
-                position: document['position'],
-                infoWindow: InfoWindow(
-                  title: document['name'] as String?,
-                  snippet: document['address'] as String?,
-                ),
-                onTap: () => {print("marker tapped"), markerTapped(document)},
+                position: documents[index]['position'],
+                // infoWindow: InfoWindow(
+                //   title: documents[index]['name'] as String?,
+                //   snippet: documents[index]['address'] as String?,
+                // ),
+                onTap: () => {print("marker tapped"), markerTapped(index)},
               ))
           .toSet(),
       onMapCreated: (mapController) {
