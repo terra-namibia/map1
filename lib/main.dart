@@ -105,6 +105,13 @@ class MapSampleState extends State<MapSample> {
     }
   }
 
+  int _selectedIndex = 0;
+  void _onNavTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -193,7 +200,7 @@ class MapSampleState extends State<MapSample> {
                     print(documents[index]['itemKey']);
 
                     final controller = await _mapController.future;
-                    await controller.animateCamera(
+                    controller.animateCamera(
                       CameraUpdate.newCameraPosition(
                         CameraPosition(
                           target: documents[index]['position'],
@@ -212,6 +219,47 @@ class MapSampleState extends State<MapSample> {
         onPressed: _goToHome,
         label: const Text('Home'),
         icon: const Icon(Icons.home),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onNavTapped,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.edit_location_alt_outlined),
+            activeIcon: Icon(Icons.edit_location_alt),
+            label: 'マップ',
+            tooltip: "This is a Map Page",
+            backgroundColor: Colors.blue,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.business),
+            activeIcon: Icon(Icons.business),
+            label: 'リスト',
+            tooltip: "This is a List Page",
+            backgroundColor: Colors.green,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            activeIcon: Icon(Icons.person),
+            label: 'マイページ',
+            tooltip: "This is a My Page",
+            backgroundColor: Colors.pink,
+          ),
+        ],
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.blue,
+        enableFeedback: true,
+        iconSize: 17,
+        // landscapeLayout: 省略
+        selectedFontSize: 18,
+        selectedIconTheme: const IconThemeData(size: 30, color: Colors.white),
+        selectedLabelStyle: const TextStyle(color: Colors.white),
+        selectedItemColor: Colors.white,
+        unselectedFontSize: 15,
+        unselectedIconTheme:
+            const IconThemeData(size: 25, color: Colors.white70),
+        unselectedLabelStyle: const TextStyle(color: Colors.white70),
+        unselectedItemColor: Colors.white70,
       ),
     );
   }
