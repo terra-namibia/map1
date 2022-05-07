@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'TestPage2.dart';
 
 void main() => runApp(const MyApp());
 
@@ -150,49 +151,62 @@ class MapSampleState extends State<MapSample> {
                   // physics: const NeverScrollableScrollPhysics(),
                   itemCount: documents.length,
                   itemBuilder: (context, index) {
-                    return Container(
-                        // fit: BoxFit.fitHeight,
-                        // width: 240,
-                        margin: EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Material(
-                            color: Colors.white,
-                            elevation: 14.0,
-                            borderRadius: BorderRadius.circular(24.0),
-                            shadowColor: Color(0x802196F3),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: <Widget>[
-                                Container(
-                                  width: 180,
-                                  height: 180,
-                                  padding: const EdgeInsets.only(
-                                      top: 14, bottom: 14, left: 14, right: 0),
-                                  child: ClipRRect(
-                                    borderRadius:
-                                        new BorderRadius.circular(24.0),
-                                    child: Image(
-                                      fit: BoxFit.fill,
-                                      image: NetworkImage(
-                                          'https://images.unsplash.com/photo-1504940892017-d23b9053d5d4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60'),
+                    return GestureDetector(
+                        onTap: () {
+                          print('GestureDetector on tap card to detail page');
+                          print(documents[index]);
+                          Navigator.of(context)
+                              .push(MaterialPageRoute(builder: (context) {
+                            return PlaceDetail(
+                                index: index, document: documents[index]);
+                          }));
+                        },
+                        child: Container(
+                            // fit: BoxFit.fitHeight,
+                            // width: 240,
+                            margin: EdgeInsets.symmetric(horizontal: 10.0),
+                            child: Material(
+                                color: Colors.white,
+                                elevation: 14.0,
+                                borderRadius: BorderRadius.circular(24.0),
+                                shadowColor: Color(0x802196F3),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    Container(
+                                      width: 180,
+                                      height: 180,
+                                      padding: const EdgeInsets.only(
+                                          top: 14,
+                                          bottom: 14,
+                                          left: 14,
+                                          right: 0),
+                                      child: ClipRRect(
+                                        borderRadius:
+                                            new BorderRadius.circular(24.0),
+                                        child: Image(
+                                          fit: BoxFit.fill,
+                                          image: NetworkImage(
+                                              'https://images.unsplash.com/photo-1504940892017-d23b9053d5d4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60'),
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                Container(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 14,
-                                        bottom: 14,
-                                        left: 12,
-                                        right: 8),
-                                    child: cardDetail(
-                                      documents[index]['name'],
-                                      documents[index]['rate'],
-                                      documents[index]['address'],
+                                    Container(
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            top: 14,
+                                            bottom: 14,
+                                            left: 12,
+                                            right: 8),
+                                        child: cardDetail(
+                                          documents[index]['name'],
+                                          documents[index]['rate'],
+                                          documents[index]['address'],
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                              ],
-                            )));
+                                  ],
+                                ))));
                   },
                   onPageChanged: (index) async {
                     print('onPageChanged card');
@@ -543,5 +557,62 @@ class StoreMap extends StatelessWidget {
         print('map tapped');
       },
     );
+  }
+}
+
+class PlaceDetail extends StatefulWidget {
+  const PlaceDetail({
+    Key? key,
+    required this.document,
+    required this.index,
+  }) : super(key: key);
+
+  final index;
+  final document;
+
+  @override
+  State<StatefulWidget> createState() {
+    return _PlaceDetailState();
+  }
+}
+
+class _PlaceDetailState extends State<PlaceDetail> {
+  String _placePhotoUrl = '';
+  var _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text("施設詳細"),
+        ),
+        body: Column(
+          children: [
+            Text(widget.document['name'] as String),
+            Text(widget.document['address'] as String),
+            Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.all(8),
+              child: Text(widget.document['rate'] as String),
+            ),
+            Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.all(8),
+              child: ElevatedButton(
+                  onPressed: () => {Navigator.of(context).pop()},
+                  child: const Text("戻る", style: TextStyle(fontSize: 30))),
+            ),
+          ],
+        ));
   }
 }
