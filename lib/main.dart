@@ -185,27 +185,7 @@ class MapSampleState extends State<MapSample> {
                                   ),
                                 ),
                               ],
-                            ))
-                        // width: 340,
-                        // width: 300,
-                        //   Padding(
-                        // padding: const EdgeInsets.only(left: 8, right: 8),child:
-                        //   Card(
-                        // child: Container(
-                        //   // height: 160,
-                        //   child: Center(
-                        //     child: Column(
-                        //         // key: documents[index]['itemKey'],
-                        //         mainAxisSize: MainAxisSize.min,
-                        //         children: [
-                        //           Text('${documents[index]['name']}'),
-                        //           Text('${documents[index]['address']}'),
-                        //           Text('${documents[index]['itemKey']}'),
-                        //         ]),
-                        //   ),
-                        // ),
-                        // ),
-                        );
+                            )));
                   },
                   onPageChanged: (index) async {
                     print('onPageChanged card');
