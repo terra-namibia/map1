@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 void main() => runApp(const MyApp());
 
@@ -26,7 +27,7 @@ class MapSample extends StatefulWidget {
 
 class MapSampleState extends State<MapSample> {
   final Completer<GoogleMapController> _mapController = Completer();
-  final _pageController = PageController();
+  final _pageController = PageController(viewportFraction: 0.80);
 
   @override
   void dispose() {
@@ -52,6 +53,7 @@ class MapSampleState extends State<MapSample> {
       'infoWindow': const InfoWindow(title: "施設1", snippet: 'いい施設'),
       'name': '施設1',
       'address': '渋谷区1丁目',
+      'rate': '4.0',
     },
     {
       'itemKey': GlobalKey(),
@@ -60,6 +62,7 @@ class MapSampleState extends State<MapSample> {
       'infoWindow': const InfoWindow(title: "施設2", snippet: 'そこそこの施設'),
       'name': '施設2',
       'address': '渋谷区2丁目',
+      'rate': '3.0',
     },
     {
       'itemKey': GlobalKey(),
@@ -68,6 +71,7 @@ class MapSampleState extends State<MapSample> {
       'infoWindow': const InfoWindow(title: "施設3", snippet: 'そこそこの施設'),
       'name': '施設3',
       'address': '渋谷区3丁目',
+      'rate': '3.0',
     },
     {
       'itemKey': GlobalKey(),
@@ -76,6 +80,7 @@ class MapSampleState extends State<MapSample> {
       'infoWindow': const InfoWindow(title: "施設4", snippet: 'そこそこの施設'),
       'name': '施設4',
       'address': '渋谷区4丁目',
+      'rate': '5.0',
     },
     {
       'itemKey': GlobalKey(),
@@ -84,6 +89,7 @@ class MapSampleState extends State<MapSample> {
       'infoWindow': const InfoWindow(title: "施設5", snippet: 'そこそこの施設'),
       'name': '施設5',
       'address': '渋谷区5丁目',
+      'rate': '2.0',
     },
   ];
 
@@ -92,10 +98,6 @@ class MapSampleState extends State<MapSample> {
   }
 
   void markerTapped(index) {
-    // print(document['itemKey']);
-    // print(document['itemKey'].currentContext);
-    // final context = document['itemKey'].currentContext!;
-    // Scrollable.ensureVisible(context);
     if (_pageController.hasClients) {
       _pageController.animateToPage(index,
           duration: const Duration(milliseconds: 100),
@@ -128,53 +130,103 @@ class MapSampleState extends State<MapSample> {
             mapController: _mapController,
             markerTapped: markerTapped,
           ),
-          SizedBox(
-            height: 90,
-            child: PageView.builder(
-              // scrollDirection: Axis.horizontal,
-              controller: _pageController,
-              // physics: const NeverScrollableScrollPhysics(),
-              itemCount: documents.length,
-              itemBuilder: (context, index) {
-                return SizedBox(
-                  width: 340,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 8),
-                    child: Card(
-                      child: Container(
-                        height: 90,
-                        child: Center(
-                          child: Column(
-                              // key: documents[index]['itemKey'],
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text('${documents[index]['name']}'),
-                                Text('${documents[index]['address']}'),
-                                Text('${documents[index]['itemKey']}'),
-                              ]),
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: Container(
+              // margin: const EdgeInsets.only(top: 6),
+              margin: EdgeInsets.symmetric(vertical: 20.0),
+              height: 150,
+              child: SizedBox(
+                child: PageView.builder(
+                  // scrollDirection: Axis.horizontal,
+                  controller: _pageController,
+                  // physics: const NeverScrollableScrollPhysics(),
+                  itemCount: documents.length,
+                  itemBuilder: (context, index) {
+                    return Container(
+                        // fit: BoxFit.fitHeight,
+                        // width: 240,
+                        margin: EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Material(
+                            color: Colors.white,
+                            elevation: 14.0,
+                            borderRadius: BorderRadius.circular(24.0),
+                            shadowColor: Color(0x802196F3),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: <Widget>[
+                                Container(
+                                  width: 180,
+                                  height: 180,
+                                  padding: const EdgeInsets.only(
+                                      top: 14, bottom: 14, left: 14, right: 0),
+                                  child: ClipRRect(
+                                    borderRadius:
+                                        new BorderRadius.circular(24.0),
+                                    child: Image(
+                                      fit: BoxFit.fill,
+                                      image: NetworkImage(
+                                          'https://images.unsplash.com/photo-1504940892017-d23b9053d5d4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60'),
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 14,
+                                        bottom: 14,
+                                        left: 12,
+                                        right: 8),
+                                    child: cardDetail(
+                                      documents[index]['name'],
+                                      documents[index]['rate'],
+                                      documents[index]['address'],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ))
+                        // width: 340,
+                        // width: 300,
+                        //   Padding(
+                        // padding: const EdgeInsets.only(left: 8, right: 8),child:
+                        //   Card(
+                        // child: Container(
+                        //   // height: 160,
+                        //   child: Center(
+                        //     child: Column(
+                        //         // key: documents[index]['itemKey'],
+                        //         mainAxisSize: MainAxisSize.min,
+                        //         children: [
+                        //           Text('${documents[index]['name']}'),
+                        //           Text('${documents[index]['address']}'),
+                        //           Text('${documents[index]['itemKey']}'),
+                        //         ]),
+                        //   ),
+                        // ),
+                        // ),
+                        );
+                  },
+                  onPageChanged: (index) async {
+                    print('onPageChanged card');
+                    print(documents[index]['name']);
+                    print(documents[index]['itemKey']);
+
+                    final controller = await _mapController.future;
+                    await controller.animateCamera(
+                      CameraUpdate.newCameraPosition(
+                        CameraPosition(
+                          target: documents[index]['position'],
+                          zoom: 14,
                         ),
                       ),
-                    ),
-                  ),
-                );
-              },
-              onPageChanged: (index) async {
-                print('onPageChanged card');
-                print(documents[index]['name']);
-                print(documents[index]['itemKey']);
-
-                final controller = await _mapController.future;
-                await controller.animateCamera(
-                  CameraUpdate.newCameraPosition(
-                    CameraPosition(
-                      target: documents[index]['position'],
-                      zoom: 14,
-                    ),
-                  ),
-                );
-              },
+                    );
+                  },
+                ),
+              ),
             ),
           ),
+
           // SizedBox(
           //   height: 90,
           //   child: ListView.builder(
@@ -227,6 +279,89 @@ class MapSampleState extends State<MapSample> {
         label: const Text('Home'),
         icon: const Icon(Icons.home),
       ),
+    );
+  }
+
+  Widget cardDetail(String restaurantName, String rate, String address) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(left: 0.0),
+          child: Container(
+              alignment: Alignment.topLeft,
+              child: Text(
+                restaurantName,
+                style: const TextStyle(
+                    color: Color.fromARGB(255, 17, 1, 41),
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold),
+              )),
+        ),
+        const SizedBox(
+          height: 5.0,
+        ),
+        Container(
+            child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            Container(
+                child: Text(
+              rate,
+              style: TextStyle(
+                color: Colors.black54,
+                fontSize: 15.0,
+              ),
+            )),
+            for (int i = 1; i < 6; i++)
+              // if (i == 0) Text("a") else Text("b"),
+              if (i <= double.parse(rate))
+                Container(
+                  child: const Icon(
+                    FontAwesomeIcons.solidStar,
+                    color: Colors.amber,
+                    size: 15.0,
+                  ),
+                )
+              else
+                Container(
+                  child: const Icon(
+                    FontAwesomeIcons.solidStar,
+                    color: Color.fromARGB(255, 207, 207, 207),
+                    size: 15.0,
+                  ),
+                ),
+            // コメント数
+            // Container(
+            //     child: const Text(
+            //   "(946)",
+            //   style: TextStyle(
+            //     color: Colors.black54,
+            //     fontSize: 18.0,
+            //   ),
+            // )),
+          ],
+        )),
+        const SizedBox(height: 5.0),
+        Container(
+            child: Text(
+          address,
+          style: TextStyle(
+            color: Colors.black54,
+            fontSize: 15.0,
+          ),
+        )),
+        const SizedBox(height: 5.0),
+        Container(
+            child: const Text(
+          "9:00-17:00",
+          style: TextStyle(
+              color: Colors.black54,
+              fontSize: 15.0,
+              fontWeight: FontWeight.bold),
+        )),
+      ],
     );
   }
 
